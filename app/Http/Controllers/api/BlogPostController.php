@@ -69,13 +69,13 @@ class BlogPostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request, Post $id)
+    public function update(UpdateRequest $request, Post $post)
     {
 
         try {
             //
 
-            if ($request->user()->id !== $id->user_id) {
+            if ($request->user()->id !== $post->user_id) {
                 return response()->json(['message' => 'Unauthorized. You do not own this post.'], Response::HTTP_FORBIDDEN);
             }
 
@@ -85,7 +85,7 @@ class BlogPostController extends Controller
             ]);
 
 
-            return response()->json([$id, 'message' => "Sucessfully updated post"], Response::HTTP_OK);
+            return response()->json([$post, 'message' => "Sucessfully updated post"], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json(['error' => 'Search failed.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -94,14 +94,14 @@ class BlogPostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Post $id)
+    public function destroy(Request $request, Post $post)
     {
         try {
-            if ($request->user()->id !== $id->user_id) {
+            if ($request->user()->id !== $post->user_id) {
                 return response()->json(['message' => 'Unauthorized Action . You do not own this post'], Response::HTTP_FORBIDDEN);
             }
 
-            $id->delete();
+            $post->delete();
 
             return response()->json(['message' => 'Post deleted successfully'], Response::HTTP_NO_CONTENT);
         } catch (Exception $e) {

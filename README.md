@@ -1,61 +1,457 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Backend API Documentation Guide
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Base URL
 
-## About Laravel
+```
+https://your-api-domain.com/api
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Authentication
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+All protected routes require a Bearer token in the Authorization header.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```http
+Authorization: Bearer your-access-token-here
+```
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Authentication Endpoints
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Register User
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**POST** `/auth/register`
 
-## Laravel Sponsors
+**Request Body:**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```json
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+}
+```
 
-### Premium Partners
+**Response (201):**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```json
+{
+    "user": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com",
+        "created_at": "2024-01-01T12:00:00Z"
+    },
+    "token": "your-access-token-here",
+    "message": "User registered successfully"
+}
+```
 
-## Contributing
+### Login User
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**POST** `/auth/login`
 
-## Code of Conduct
+**Request Body:**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```json
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+```
 
-## Security Vulnerabilities
+**Response (200):**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```json
+{
+    "user": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com"
+    },
+    "token": "your-access-token-here",
+    "message": "Login successful"
+}
+```
 
-## License
+### Logout User
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**POST** `/auth/logout`
+
+**Headers:** `Authorization: Bearer your-token`
+
+**Response (200):**
+
+```json
+{
+    "message": "Logout successful"
+}
+```
+
+---
+
+## Posts Endpoints
+
+### Get All Posts
+
+**GET** `/posts`
+
+**Query Parameters:**
+
+-   `page` (optional): Page number for pagination
+-   `per_page` (optional): Number of posts per page (default: 15)
+
+**Response (200):**
+
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "title": "My First Post",
+            "content": "This is the content of my first post...",
+            "user_id": 1,
+            "user": {
+                "id": 1,
+                "name": "John Doe"
+            },
+            "created_at": "2024-01-01T12:00:00Z",
+            "updated_at": "2024-01-01T12:00:00Z"
+        }
+    ],
+    "links": {
+        "first": "http://api.com/posts?page=1",
+        "last": "http://api.com/posts?page=10",
+        "prev": null,
+        "next": "http://api.com/posts?page=2"
+    },
+    "meta": {
+        "current_page": 1,
+        "last_page": 10,
+        "per_page": 15,
+        "total": 150
+    }
+}
+```
+
+### Get Single Post
+
+**GET** `/posts/{id}`
+
+**Response (200):**
+
+```json
+{
+    "data": {
+        "id": 1,
+        "title": "My First Post",
+        "content": "This is the content of my first post...",
+        "user_id": 1,
+        "user": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com"
+        },
+        "created_at": "2024-01-01T12:00:00Z",
+        "updated_at": "2024-01-01T12:00:00Z"
+    }
+}
+```
+
+### Create New Post
+
+**POST** `/posts`
+
+**Headers:** `Authorization: Bearer your-token`
+
+**Request Body:**
+
+```json
+{
+    "title": "My New Post",
+    "content": "This is the content of my new post..."
+}
+```
+
+**Response (201):**
+
+```json
+{
+    "data": {
+        "id": 2,
+        "title": "My New Post",
+        "content": "This is the content of my new post...",
+        "user_id": 1,
+        "created_at": "2024-01-01T13:00:00Z",
+        "updated_at": "2024-01-01T13:00:00Z"
+    },
+    "message": "Post created successfully"
+}
+```
+
+### Update Post
+
+**PUT** `/posts/{id}`
+
+**Headers:** `Authorization: Bearer your-token`
+
+**Request Body (partial update allowed):**
+
+```json
+{
+    "title": "Updated Post Title",
+    "content": "Updated content..."
+}
+```
+
+**Response (200):**
+
+```json
+{
+    "data": {
+        "id": 1,
+        "title": "Updated Post Title",
+        "content": "Updated content...",
+        "user_id": 1,
+        "created_at": "2024-01-01T12:00:00Z",
+        "updated_at": "2024-01-01T14:00:00Z"
+    },
+    "message": "Successfully updated post"
+}
+```
+
+### Delete Post
+
+**DELETE** `/posts/{id}`
+
+**Headers:** `Authorization: Bearer your-token`
+
+**Response (200):**
+
+```json
+{
+    "message": "Post deleted successfully"
+}
+```
+
+---
+
+## User Profile Endpoints
+
+**PUT** `/user/profile`
+
+**Headers:** `Authorization: Bearer your-token`
+
+**Request Body:**
+
+```json
+{
+    "name": "John Updated",
+    "email": "john.updated@example.com"
+}
+```
+
+**Response (200):**
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "John Updated",
+        "email": "john.updated@example.com",
+        "updated_at": "2024-01-01T15:00:00Z"
+    },
+    "message": "Profile updated successfully"
+}
+```
+
+--
+
+## Error Responses
+
+### Validation Errors (422)
+
+```json
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "title": ["The title field is required."],
+        "email": ["The email has already been taken."]
+    }
+}
+```
+
+### Unauthorized (401)
+
+```json
+{
+    "message": "Unauthenticated."
+}
+```
+
+### Forbidden (403)
+
+```json
+{
+    "message": "Unauthorized. You do not own this post."
+}
+```
+
+### Not Found (404)
+
+```json
+{
+    "message": "Post not found."
+}
+```
+
+### Server Error (500)
+
+```json
+{
+    "error": "Something went wrong. Please try again later."
+}
+```
+
+---
+
+## Frontend Implementation Examples
+
+### JavaScript/Axios Example
+
+```javascript
+// Set up axios with base configuration
+const api = axios.create({
+    baseURL: "https://your-api-domain.com/api",
+    headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+    },
+});
+
+// Add token to requests if available
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Login function
+async function login(email, password) {
+    try {
+        const response = await api.post("/auth/login", { email, password });
+        localStorage.setItem("auth_token", response.data.token);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+// Get posts function
+async function getPosts(page = 1) {
+    try {
+        const response = await api.get(`/posts?page=${page}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+// Create post function
+async function createPost(title, content) {
+    try {
+        const response = await api.post("/posts", { title, content });
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+```
+
+### React Hook Example
+
+```javascript
+// Custom hook for posts
+import { useState, useEffect } from "react";
+
+export const usePosts = () => {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
+    const fetchPosts = async () => {
+        try {
+            setLoading(true);
+            const data = await getPosts();
+            setPosts(data.data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { posts, loading, error, refetch: fetchPosts };
+};
+```
+
+---
+
+## Rate Limiting
+
+-   Authentication endpoints: 5 requests per minute
+-   Post creation: 10 posts per hour per user
+-   General API calls: 100 requests per minute
+
+---
+
+## Content-Type Headers
+
+Always include these headers in your requests:
+
+```http
+Content-Type: application/json
+Accept: application/json
+```
+
+---
+
+## CORS Settings
+
+The API supports cross-origin requests from:
+
+-   `localhost:3000` (development)
+-   `your-frontend-domain.com` (production)
+
+---
+
+## Testing the API
+
+You can test the API endpoints using tools like:
+
+-   Postman
+-   Insomnia
+-   curl commands
+-   Your browser's developer tools
+
+### Example curl command:
+
+```bash
+curl -X POST https://your-api-domain.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"email": "john@example.com", "password": "password123"}'
+```
+
+---
+
+## Support
+
+For questions about this API, contact the development team or check the repository documentation.
