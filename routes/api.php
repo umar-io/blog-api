@@ -12,7 +12,11 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 
 // Protected routes for authenticated users
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::prefix('auth')->controller(AuthController::class)->group(function () {
+        Route::post('/logout', 'logout');
+    });
+
 
     Route::prefix('posts')->controller(BlogPostController::class)->group(function () {
         Route::post('/', 'store');
@@ -20,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{post}', 'destroy');
     });
 });
+
 
 // Public routes for posts (no authentication required)
 Route::prefix('posts')->controller(BlogPostController::class)->group(function () {

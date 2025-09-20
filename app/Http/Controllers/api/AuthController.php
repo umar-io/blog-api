@@ -61,4 +61,20 @@ class AuthController extends Controller
             return response()->json(['message' => 'Error Trying to login'], 500);
         }
     }
+
+    public function logout(Request $request)
+    {
+        try {
+
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'message' => 'Logout successful'
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Logout failed.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
