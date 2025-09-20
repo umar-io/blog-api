@@ -18,6 +18,8 @@ class Post extends Model
         'body',
     ];
 
+    protected $hidden = ['user_id']; //using resources would be a better approach
+
     public function user()
     {
         return $this->belongsTo(User::class);

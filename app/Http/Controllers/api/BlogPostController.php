@@ -11,18 +11,19 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class BlogPostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index()
     {
-        $all_post = Post::get();
+        $all_posts = Post::with('user:id,name') 
+            ->latest() 
+            ->paginate(15);
 
         return response()->json([
-            $all_post
+            $all_posts
         ], 200);
     }
 
